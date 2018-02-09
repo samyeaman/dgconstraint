@@ -1,0 +1,11 @@
+Package: dgconstraint
+Type: Package
+Title: Calculates Metrics of Diversity Constraint for Genomics of Adaptation
+Version: 0.1.0
+Authors@R: person("Sam", "Yeaman", email = "samuel.yeaman@ucalgary.ca",
+  role = c("aut", "cre"))
+Description: This package provides various functions for calculating the constraint metrics described in the manuscript "Quantifying how constraints limit the diversity of viable routes to adaptation". Please read this paper for a full description of the usage of these functions.
+License: CC0
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1

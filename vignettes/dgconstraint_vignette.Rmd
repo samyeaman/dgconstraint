@@ -1,0 +1,168 @@
+---
+title: "Dgconstraint"
+author: "Alana Schick"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{dgconstraint R package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+The [dgconstraint R package](https://github.com/samyeaman/dgconstraint) provides functions for calculating C-scores, which quantify the repeatability of adaptation by using probability-based models to determine the deviation between observed repeaatability and expectations under a range of null hypotheses. Because these indices are unitless, they provide a general approach to quantfying and comparing how constraints drive convergence at the genome scale across a wide range of traits and taxa.
+
+This vignette describes the functions included in the package as well as two examples of how they can be used, with data sets from yeast and conifers. Kindly cite the work as follows: ["Yeaman et al 2018. Quantifying how constraints limit the diversity of viable routes to adaptation. PLOS Genetics."](https://doi.org/10.1371/journal.pgen.1007717)
+
+## Installation
+
+To install the dgconstraint R package (Github version), use:
+
+```{r install, eval = FALSE}
+library(devtools)
+install_github("samyeaman/dgconstraint")
+```
+
+Then load the package in R:
+
+```{r loading}
+library(dgconstraint)
+```
+
+## Overview
+
+There are two broad ways to use this package:
+
+1) For a <b>single pair of lineages</b>. Simple functions are provided that will output statistics for a given pair of lineages. These two lineages are passed to the functions as separate vectors of equal length, where each entry has information aout a given gene (or SNP, window, etc.). It is vitally importatnt in such cases that the two vectors are sorted in the same way, so that the first entry in one vector represents the same gene/SNP/window as the first entry in the second vector and so on. This approach allows you to customize calculation of C-scores, which may be more desireable when more complex designs are used that involve treatments, comparisons among combinations of lineages separated by different distances on a phylogeny, etc.
+
+2) For a data set containing <b>multiple lineages</b>. All-in-one functions are provided that will output statistics by conducting all pairwise comparisons among the input lineages. In this case, the functions assume that the input data has lineages in columns and genes (or SNPs, windows, etc.) in rows.
+
+## Core functions
+
+Depending on the type of data you are working with and hypotheses you seek to test, various functions are applicable. First we present functions for <b>continuously-distributed data</b>, followed by functions for <b>binary data</b>. 
+
+In all cases, the C-score and likelihood-based estimation of the number of genes that potentially contribute to adaptation require input data that provides evidence about which genes are likely involved in adaptation. 
+
+For continuously-distributed data, this may be in the form of p-values, F<sub>st</sub>, GWAS-effect sizes, or other metrics, but whatever form of datam it is critical to rescale it so that larger values indicate greater evidence of adaptation. For example, for p-values, a -1*log<sub>10</sub> transformation is appropriate. 
+
+For binary data, a value of 1 should be used to represent "adaptation" and a value of 0 to represent "no adaptation".
+
+### Note: Treatment of NAs
+
+Missing data is very common in genomic studies of adaptation but the methods described here will not work while your input data includes NAs. If some rows contain NAs, they should be trimmed from the dataset and the methods for rescaling the C-scores should be used, which are described below and in further detail in the manuscript in the section titled "Adjusting for incomplete sampling of the genome". If there are some genes that you suspect are highly important and you don't want to exclude them from the analysis, it may be relevant to sub-sample youe lineages to remove lineages with NAs. 
+
+### Continuously-distributed data
+
+For continuously-distributed data, C-scores are calculated using Pearson's $\chi^2$ goodness of fit statistic. The magnitude of $C_{chisq}$ represents deviation between the observed amount of repeatability and that expected under the null hypothesis. This will vary as a functino of the diversity constraints affecting trait evolution, but not the number of lineages being compared.
+
+To determine a p-value, the $\chi^2$ value is compared to a null distribution of $\chi^2$ statistics simulated under randomness to calculate the proportion of replicates in the null that exceed the observed test statistic.
+
+#### Single pair of lineages
+
+The `single_c_chisq()` function calculates the C-score for a given pair of lineages,  which are submitted as vectors and the `single_p_chisq()` function calculates a p-value for the C-score being significantly different than 0.
+
+```{r singlechisq, eval=FALSE}
+c_score <- single_c_chisq(lineage1, lineage2, num_permute = 10000, na.rm = F)
+
+p_value <- single_p_chisq(lineage1, lineage2, num_permute = 10000, na.rm = F)
+```
+
+#### Multiple lineages
+
+The `pairwise_c_chisq()` function calcluates the C-score across all pairs of of data for a matrix with more than two lineages. The `allwise_p_chisq()` function calculates a p-value for the C-score being significantly different than 0.
+
+```{r multiplechisq, eval=FALSE}
+c_score <- pairwise_c_chisq(matrix, num_permute = 10000, na.rm = F)
+
+p_value <- allwise_p_chisq(matrix, num_permute = 10000, na.rm = F)
+```
+
+### Binary data
+
+For binary data, C-scores are calculated using the hypergeometric distribution. The magnitude of $C_{hyper}$ represents the excess in overlap due to convergence relative to the null hypothesis.
+
+To determine a p-value for a pair of lineages, the hypergeometric probaility is used to calculate the exact probability of observing $x$ or more loci contributing to adaptation.
+
+For multiple lineages, $C_{hyper}$ is the mean of all pairwise C-scores.
+
+#### Single pair of lineages
+
+The `single_c_hyper()` function calculates the C-score for a given pair of lineages, which are submitted as vectors, and the `single_p_hyper()` function calculates a p-value for the C-score being signifantly different than 0.
+
+```{r singlehyper, eval=FALSE}
+c_score <- single_c_hyper(lineage1, lineage2, na.rm = F)
+
+p_value <- single_p_hyper(lineage1, lineage2, na.rm = F)
+```
+
+#### Multiple lineages
+
+The `pairwise_c_hyper()` function calculates the mean C-score across all pairs of data for a matrix of more than two lineages.
+
+```{r multiplehyper, eval=FALSE}
+c_score <- pairwise_c_hyper(matrix, na.rm = F)
+```
+
+#### Proportion of genes contributing to adaptation
+
+The `estimate_pa()` function uses the hypergeomtric distribution to estimate the proportion of genes that can potentially contribute to adaptation, using binary input data from multiple lineages. The `likelihood_pa()` function returns the maximum likelihood estimate of the proportion.
+
+```{r proportion, eval=FALSE}
+prop_adaptive <- estimate_pa(matrix, ndigits = 4, show.plot = F, na.rm = F)
+
+max_likelihood <- likelihood_pa(prop_adaptive, matrix, na.rm = F)
+```
+
+### Adjusting for incomplete sampling of the genome
+
+The amount of the constraint quantified by the C-score will depend on the proportion of the mutational target that is sampled by the sequencing approach and some approaches, such as targeted sequence capture, will sample only a subset of the total number of genes in the genome, which will cause a bias in the estimate of constraint due to incomplete sampling.
+
+For binary data, $C_{hyper}$ can be corrected by dividing all input variables by the proportion of the mutational target that has been sampled, yielding $C_{hyper-adj}$
+
+For continuously-distributed data, $C_{chisq}$ can be corrected by adding...
+
+C chisq-adj
+
+## Example data sets
+
+Two example data sets are provided to demonstrate how these functions could be used.
+
+### Example: Stress resistance in yeast
+
+The 
+
+### Example: Cold tolerance in conifers
+
+## Figures
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+Enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+Write math expressions, e.g. $Y = X\beta + \epsilon$, and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+

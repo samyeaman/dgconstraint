@@ -143,26 +143,3 @@ The
 
 ### Example: Cold tolerance in conifers
 
-## Figures
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
-Enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-Write math expressions, e.g. $Y = X\beta + \epsilon$, and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-

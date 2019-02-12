@@ -22,6 +22,10 @@ adaptive loci (P_a) using likelihood-based tests. Setting na.rm = T
 assumes that missing values are true negatives.
 }
 \examples{
-
+array1 <- array (0,c(5000,20))
+array1[cbind(1:20,1:20)] <- 1
+array1[1:5,1:3] <- 1
+array1[6:10,4:6] <- 1
+estimate_pa(array1)
 
 }

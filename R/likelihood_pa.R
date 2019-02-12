@@ -14,7 +14,8 @@
 #' array1[cbind(1:20,1:20)] <- 1
 #' array1[1:5,1:3] <- 1
 #' array1[6:10,4:6] <- 1
-#' likelihood_pa (array1)
+#' test_proportion <- 0.2
+#' likelihood_pa (test_proportion, array1)
 #'
 #' @export
 

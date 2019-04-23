@@ -1,0 +1,201 @@
+---
+title: "Evolve-and-resequence experiment parallelism with dgconstraint"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(png)
+library(grid)
+```
+The `dgconstraint` package provides functions for calculating the constraint metrics described in the manuscript "Quantifying how constraints limit the diversity of viable routes to adaptation"  
+
+## Guide  
+### Step 1: Setting up    
+* Before you start analyzing, there are a few things you need to do:  
+  + You need to find useful data and save them as "Author2017" in the csv format.  
+  + You need to create a data-in and data-out foulder; data-in will contain the data/papers you would like to analyze, data-out will contain the analysis of the paper 	after all the calculations have been completed.  
+  + You will need to decide which function will work with your data, depending on if it has multiple generations, multiple selective pressures, a single generation in matrix form or a single generation in non-matrix form.
+
+### Step 2: Working with the data
+Not all of the data that you will come across will be perfect. Some of the data might need to be adapted to work in the following functions.  
+i.e: This following data set does not look like it has any frequencies, but the X's indicate if the gene is present at that time point and so you can replace the X's with 1's and the blank squares with 0 in the dataset to make it run in the function.
+
+
+```{r, echo=FALSE, out.width = '75%', fig.pos = "H", fig.align="center"}
+knitr::include_graphics("figures/Sandberg.png")
+```
+
+Here the coloured boxes indicates that the gene was present at that time point, and thus replace the coloured boxes with 1's and the blank boxes with 0's.  
+
+```{r, echo=FALSE, out.width = '75%', fig.pos = "H", fig.align="center"}
+knitr::include_graphics("figures/Creamer.png")
+```
+
+And in other cases the column names that are needed in the following functions might not be the same as the ones provided in the data. *Population*, *Gene*, and *frequency* **need** to be the names of the columns associated to their proper data. For example, instead of the needed name *Population*, the data might have, population(non-capitalized),Populations(plural) or populations. If that is the case, then you must change the name to *Population*, either by the code  
+```{r, echo=FALSE}
+print("names(data)[]<-Population") 
+```
+having the column number associated to the name you want to change in [ ] or by changing it manually in the data. The same follows for *Gene* and *frequency*.  
+
+### Step 3: Walk-Through
+By now you should have made your files, chosen a dataset you want to analysis and saved it as "Author2018" in he csv format, decided which of the following functions works best for that data set and checked to see if the data has the proper format.  
+And now you are ready to start analyzing your data!  
+I will use the multiple generations function as an example for the walk-through.  
+
+* **multigen_c_hyper(paper, environment, species, generations)** is the function we are using:    
+  + set the parameter *paper* = "Author2018"  
+  + set the parameter *environment* to the environment used in the experiment, lets say "YPD"  
+  + set the parameter *species* to either Sac" or "Ecoli_K12" or "Ecoli_O157-H7", lets say "Sac".  
+  + set the paramter *generations* to the number of generations in the dataset in a vector format, lets say c("0", "100", "500", "1000", "1500")    
+  
+And so your function will look like this: multigen_c_hyper("Author2018, "YPD", "Sac", c("0", "100", "500", "1000", "1500"))  
+Your function should be good to go!  
+After you ran your code the analysis will be saved into the data-out folder that you already created. It should be called "Author2018_Analysis.csv". Since this is a multiple generation example, you will also have seperate information for each generation, that will include the populations, genes and frequencies at that time point. It will also be saved in the data-out folder under the name "Author2018_g.csv", g being either 0, 100, 500, 1000 or 1500 for this example.  
+
+### Step 4: Solving Errors
+If you come across an error while running your function: 
+
+* Make sure you picked the right function for your data, the single generation functions will not work in the multiple generation function and vice versa. Sometimes it is hard to distinguish between the functions, check the data format below in the each of the sections to help choose which functions is best for your data.      
+* Double check that all the parameters are set properly and that they match the information in your data.      
+* Make sure the column names are correct, it is easy to forget to change a column name gene to the needed one *Gene*. The code is ran in a way that it will recognize *Gene* and not gene. Same goes for *Population* and *frequency*.    
+* Lastly, if there is an error when it tries to calculate the c-hyper, that could be due to lack of parallelism, populations or genes in that generation/selective pressure. If you are unsure, take a look at the original data to see if it matches the conclusion of no parallelism.      
+  
+## Calculations for a Multiple Generation Function  
+This function allows you to calculate the pairwise C-score using the hypergeometric approach, a p-value for 'all lineages' contrast using chi-square, and the	estimates of the effective proportion of adaptive loci for a data set with multiple generations.
+
+### Data  
+The data must have more than one generation, a column called **Populations**, a column 	called **Gene**, and **frequencies** associated with the Gene, Population and generation. The data can have other columns as well, but as long as we have the main ones named above, then the function will work.      
+This data should be saved in the data-in folder that you created beforehand.
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+library(tidyverse)
+data <- read_csv("data-in/Lang2014.csv")
+```
+```{r }
+head(data)
+```
+Here we can see that the generations are 0, 140, 335, 415, 505, 585 and so on. All the numbers below the generations are the frequencies associated with the Gene in the Population.   
+ex: *Gene* UBX5 has a *frequency* of 0.94 at *generation* 335 in the *Population* BYB1-B01.  
+
+Now we have to fill in the parameters in the function: 
+**multigen_c_hyper(paper, environment, species, generations)**  
+If we use the data above as an example, then the function would look like this:  
+**multigen_c_hyper("Author2014", "YPD", "Sac", c("0", "140", "240", "335", "415", "505", "585", "665", "745", "825", "910", "1000"))**  
+
+### Results  
+The package will give you the results in a table with all the information and calculations such as the paper, environment, generations, c-hyper, p-value, estimate, number of popuations, number of non parallel genes, number of parallel genes and a list of the parallel genes.  
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+data <- read_csv("data-out/Lang2014_Analysis.csv")
+```
+```{r }
+head(data)
+```
+The analysis will be automatically saved into the data-out folder that you created beforehand.
+
+## Calculations for Multiple Selective Pressure Function  
+This function allows you to calculate the pairwise C-score using the hypergeometric approach, a p-value for 'all lineages' contrast using chi-square, and the estimates of the effective proportion of adaptive loci for a data set with  multiplte selective pressures.  
+
+### Data  
+The data must have more than one selective pressure, a column called **Populations**, a column 	called **Gene**, and a column called **frequency**.    
+This data should be saved in the data-in folder that you created beforehand.  
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+library(tidyverse)
+data <- read_csv("data-in/Jerison 2017.csv")
+```
+```{r }
+head(data)
+```
+Here we can see that the selective pressures are OT(Optimal Temperature) and HT(High Temperature).  
+ex: *Gene* AFI1 has a *frequency* of 0.6666667 in the *Population* LK5-F08 with the *selective pressure* HT.  
+
+Now we have to fill in the parameters in the function: **multipressure_c_hyper(paper, environment, species, selective_pressure)**  
+If we use the data above as an example, then the function would look like this:  
+**multipressure_c_hyper("Author2017", "YPD", "Ecoli_K12", c("OT", "HT"))**  
+
+### Results  
+The package will give you the results in a table with all the information and calculations such as the paper, environment, slective_pressure, c-hyper, p-value, estimate, number of non parallel genes, number of parallel genes and a list of the parallel genes.    
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+data <- read_csv("data-out/Jersion2017_Analysis_Temp.csv")
+```
+```{r }
+head(data)
+```
+The analysis will be automatically saved into the data-out folder that you created beforehand.  
+
+## Calculations for a Single Generation Function in Matrix Form  
+This function allows you to calculate the pairwise C-score using the hypergeometric approach, a p-value for 'all lineages' contrast using chi-square, and the estimates of the effective proportion of adaptive loci for a data set with a single generation in a matrix form.   
+
+### Data  
+The data must be in a form of a matrix, with the **Population** occupying either the names of the columns or the rows, usually column, and the **Gene** occupying the names of the columns or rows, which ever is not occupied by the Population. Each row and column will be filled with **frequencies** associated to a Gene in the Population.    
+This data should be saved in the data-in folder that you created beforehand.  
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+library(tidyverse)
+data <- read_csv("data-in/Sandberg_2014.csv")
+```
+```{r }
+head(data)
+```
+Here we can see that we have the *Population* as the column names, (ALE1, ALE2, ALE3, ALE4, ALE5, ALE6, ALE7, ALE8, ALE9 and ALE10), and the *Gene* as the row names. This data represents only one generation, usually the end point, and thus indicates a 1 if the *Gene* was present, and a 0 if the *Gene* was absent.    
+ex: The *Gene* cbpA was only present in the *Population* ALE2 at this time point.  
+
+Now we have to fill in the parameters in the function: **singlematrix_c_hyper(paper, environment, species, population)**
+If we use the data above as an example, then the function would look like this:  
+**singlematrix_c_hyper("Author2014", "glucose minimal media", "Ecoli_K12", c("ALE1", "ALE2", "ALE3", "ALE4", "ALE5", "ALE6", "ALE7", "ALE8", "ALE9", "ALE10"))**  
+
+### Results  
+The package will give you the results in a table with all the information and calculations such as the paper, environment, c-hyper, p-value, estimate, number of non parallel genes, number of parallel genes and a list of the parallel genes.  
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+data <- read_csv("data-out/Sandberg2014_Analysis.csv")
+```
+```{r }
+head(data)
+```
+The analysis will be automatically saved into the data-out folder that you created beforehand.  
+
+## Calculations for a Single Generation Functionin Non-Matrix Form  
+This function allows you to calculate the pairwise C-score using the hypergeometric approach, a p-value for 'all lineages' contrast using chi-square, and the estimates of the effective proportion of adaptive loci for a data set with a single generation.
+
+### Data  
+The data must have a column called **Population**, a column 	called **Gene**, and a column **frequency**. The data can have other columns as well, but as long as we have the main ones named above, the function will work.      
+This data should be saved in the data-in folder that you created beforehand.
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+library(tidyverse)
+data <- read_csv("data-in/McCloskey 2018.csv")
+```
+```{r }
+head(data)
+```
+Here we can see that we have a *Population* column, a *Gene* column and a *frequency* column.  
+ex: The *Gene* araA in the *Population* Evo04ptsHIcrrEvo03EP has a *frequency* of 0.738 at this time point.  
+
+Now we have to fill in the parameters in the function: **singlegen_c_hyper(paper, environment, species)**  
+If we use the data above as an example, then the function would look like this:  
+**singlegen_c_hyper("Author2018", "YPD", "Ecoli_K12")**  
+
+### Results  
+The package will give you the results in a table with all the information and calculations such as the paper, environment, c-hyper, p-value, estimate, number of non parallel genes, number of parallel genes and a list of the parallel genes.  
+
+i.e:
+```{r, echo = FALSE, results = 'hide', warning=FALSE , message=FALSE}
+data <- read_csv("data-out/McCloskey2018_Analysis.csv")
+```
+```{r }
+head(data)
+```
+The analysis will be automatically saved into the data-out folder that you created beforehand.  

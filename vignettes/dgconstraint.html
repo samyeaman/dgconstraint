@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Alana Schick" />
+
+<meta name="date" content="2019-02-12" />
+
+<title>Dgconstraint</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Dgconstraint</h1>
+<h4 class="author"><em>Alana Schick</em></h4>
+<h4 class="date"><em>2019-02-12</em></h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#core-functions">Core functions</a><ul>
+<li><a href="#note-treatment-of-nas">Note: Treatment of NAs</a></li>
+<li><a href="#continuously-distributed-data">Continuously-distributed data</a></li>
+<li><a href="#binary-data">Binary data</a></li>
+<li><a href="#adjusting-for-incomplete-sampling-of-the-genome">Adjusting for incomplete sampling of the genome</a></li>
+</ul></li>
+<li><a href="#example-data-sets">Example data sets</a><ul>
+<li><a href="#example-stress-resistance-in-yeast">Example: Stress resistance in yeast</a></li>
+<li><a href="#example-cold-tolerance-in-conifers">Example: Cold tolerance in conifers</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The <a href="https://github.com/samyeaman/dgconstraint">dgconstraint R package</a> provides functions for calculating C-scores, which quantify the repeatability of adaptation by using probability-based models to determine the deviation between observed repeaatability and expectations under a range of null hypotheses. Because these indices are unitless, they provide a general approach to quantfying and comparing how constraints drive convergence at the genome scale across a wide range of traits and taxa.</p>
+<p>This vignette describes the functions included in the package as well as two examples of how they can be used, with data sets from yeast and conifers. Kindly cite the work as follows: <a href="https://doi.org/10.1371/journal.pgen.1007717">“Yeaman et al 2018. Quantifying how constraints limit the diversity of viable routes to adaptation. PLOS Genetics.”</a></p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>To install the dgconstraint R package (Github version), use:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
+<span class="kw">install_github</span>(<span class="st">&quot;samyeaman/dgconstraint&quot;</span>)</code></pre></div>
+<p>Then load the package in R:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dgconstraint)</code></pre></div>
+</div>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>There are two broad ways to use this package:</p>
+<ol style="list-style-type: decimal">
+<li><p>For a <b>single pair of lineages</b>. Simple functions are provided that will output statistics for a given pair of lineages. These two lineages are passed to the functions as separate vectors of equal length, where each entry has information aout a given gene (or SNP, window, etc.). It is vitally importatnt in such cases that the two vectors are sorted in the same way, so that the first entry in one vector represents the same gene/SNP/window as the first entry in the second vector and so on. This approach allows you to customize calculation of C-scores, which may be more desireable when more complex designs are used that involve treatments, comparisons among combinations of lineages separated by different distances on a phylogeny, etc.</p></li>
+<li><p>For a data set containing <b>multiple lineages</b>. All-in-one functions are provided that will output statistics by conducting all pairwise comparisons among the input lineages. In this case, the functions assume that the input data has lineages in columns and genes (or SNPs, windows, etc.) in rows.</p></li>
+</ol>
+</div>
+<div id="core-functions" class="section level2">
+<h2>Core functions</h2>
+<p>Depending on the type of data you are working with and hypotheses you seek to test, various functions are applicable. First we present functions for <b>continuously-distributed data</b>, followed by functions for <b>binary data</b>.</p>
+<p>In all cases, the C-score and likelihood-based estimation of the number of genes that potentially contribute to adaptation require input data that provides evidence about which genes are likely involved in adaptation.</p>
+<p>For continuously-distributed data, this may be in the form of p-values, F<sub>st</sub>, GWAS-effect sizes, or other metrics, but whatever form of datam it is critical to rescale it so that larger values indicate greater evidence of adaptation. For example, for p-values, a -1*log<sub>10</sub> transformation is appropriate.</p>
+<p>For binary data, a value of 1 should be used to represent “adaptation” and a value of 0 to represent “no adaptation”.</p>
+<div id="note-treatment-of-nas" class="section level3">
+<h3>Note: Treatment of NAs</h3>
+<p>Missing data is very common in genomic studies of adaptation but the methods described here will not work while your input data includes NAs. If some rows contain NAs, they should be trimmed from the dataset and the methods for rescaling the C-scores should be used, which are described below and in further detail in the manuscript in the section titled “Adjusting for incomplete sampling of the genome”. If there are some genes that you suspect are highly important and you don’t want to exclude them from the analysis, it may be relevant to sub-sample youe lineages to remove lineages with NAs.</p>
+</div>
+<div id="continuously-distributed-data" class="section level3">
+<h3>Continuously-distributed data</h3>
+<p>For continuously-distributed data, C-scores are calculated using Pearson’s <span class="math inline">\(\chi^2\)</span> goodness of fit statistic. The magnitude of <span class="math inline">\(C_{chisq}\)</span> represents deviation between the observed amount of repeatability and that expected under the null hypothesis. This will vary as a functino of the diversity constraints affecting trait evolution, but not the number of lineages being compared.</p>
+<p>To determine a p-value, the <span class="math inline">\(\chi^2\)</span> value is compared to a null distribution of <span class="math inline">\(\chi^2\)</span> statistics simulated under randomness to calculate the proportion of replicates in the null that exceed the observed test statistic.</p>
+<div id="single-pair-of-lineages" class="section level4">
+<h4>Single pair of lineages</h4>
+<p>The <code>single_c_chisq()</code> function calculates the C-score for a given pair of lineages, which are submitted as vectors and the <code>single_p_chisq()</code> function calculates a p-value for the C-score being significantly different than 0.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">c_score &lt;-<span class="st"> </span><span class="kw">single_c_chisq</span>(lineage1, lineage2, <span class="dt">num_permute =</span> <span class="dv">10000</span>, <span class="dt">na.rm =</span> F)
+
+p_value &lt;-<span class="st"> </span><span class="kw">single_p_chisq</span>(lineage1, lineage2, <span class="dt">num_permute =</span> <span class="dv">10000</span>, <span class="dt">na.rm =</span> F)</code></pre></div>
+</div>
+<div id="multiple-lineages" class="section level4">
+<h4>Multiple lineages</h4>
+<p>The <code>pairwise_c_chisq()</code> function calcluates the C-score across all pairs of of data for a matrix with more than two lineages. The <code>allwise_p_chisq()</code> function calculates a p-value for the C-score being significantly different than 0.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">c_score &lt;-<span class="st"> </span><span class="kw">pairwise_c_chisq</span>(matrix, <span class="dt">num_permute =</span> <span class="dv">10000</span>, <span class="dt">na.rm =</span> F)
+
+p_value &lt;-<span class="st"> </span><span class="kw">allwise_p_chisq</span>(matrix, <span class="dt">num_permute =</span> <span class="dv">10000</span>, <span class="dt">na.rm =</span> F)</code></pre></div>
+</div>
+</div>
+<div id="binary-data" class="section level3">
+<h3>Binary data</h3>
+<p>For binary data, C-scores are calculated using the hypergeometric distribution. The magnitude of <span class="math inline">\(C_{hyper}\)</span> represents the excess in overlap due to convergence relative to the null hypothesis.</p>
+<p>To determine a p-value for a pair of lineages, the hypergeometric probaility is used to calculate the exact probability of observing <span class="math inline">\(x\)</span> or more loci contributing to adaptation.</p>
+<p>For multiple lineages, <span class="math inline">\(C_{hyper}\)</span> is the mean of all pairwise C-scores.</p>
+<div id="single-pair-of-lineages-1" class="section level4">
+<h4>Single pair of lineages</h4>
+<p>The <code>single_c_hyper()</code> function calculates the C-score for a given pair of lineages, which are submitted as vectors, and the <code>single_p_hyper()</code> function calculates a p-value for the C-score being signifantly different than 0.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">c_score &lt;-<span class="st"> </span><span class="kw">single_c_hyper</span>(lineage1, lineage2, <span class="dt">na.rm =</span> F)
+
+p_value &lt;-<span class="st"> </span><span class="kw">single_p_hyper</span>(lineage1, lineage2, <span class="dt">na.rm =</span> F)</code></pre></div>
+</div>
+<div id="multiple-lineages-1" class="section level4">
+<h4>Multiple lineages</h4>
+<p>The <code>pairwise_c_hyper()</code> function calculates the mean C-score across all pairs of data for a matrix of more than two lineages.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">c_score &lt;-<span class="st"> </span><span class="kw">pairwise_c_hyper</span>(matrix, <span class="dt">na.rm =</span> F)</code></pre></div>
+</div>
+<div id="proportion-of-genes-contributing-to-adaptation" class="section level4">
+<h4>Proportion of genes contributing to adaptation</h4>
+<p>The <code>estimate_pa()</code> function uses the hypergeomtric distribution to estimate the proportion of genes that can potentially contribute to adaptation, using binary input data from multiple lineages. The <code>likelihood_pa()</code> function returns the maximum likelihood estimate of the proportion.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">prop_adaptive &lt;-<span class="st"> </span><span class="kw">estimate_pa</span>(matrix, <span class="dt">ndigits =</span> <span class="dv">4</span>, <span class="dt">show.plot =</span> F, <span class="dt">na.rm =</span> F)
+
+max_likelihood &lt;-<span class="st"> </span><span class="kw">likelihood_pa</span>(prop_adaptive, matrix, <span class="dt">na.rm =</span> F)</code></pre></div>
+</div>
+</div>
+<div id="adjusting-for-incomplete-sampling-of-the-genome" class="section level3">
+<h3>Adjusting for incomplete sampling of the genome</h3>
+<p>The amount of the constraint quantified by the C-score will depend on the proportion of the mutational target that is sampled by the sequencing approach and some approaches, such as targeted sequence capture, will sample only a subset of the total number of genes in the genome, which will cause a bias in the estimate of constraint due to incomplete sampling.</p>
+<p>For binary data, <span class="math inline">\(C_{hyper}\)</span> can be corrected by dividing all input variables by the proportion of the mutational target that has been sampled, yielding <span class="math inline">\(C_{hyper-adj}\)</span></p>
+<p>For continuously-distributed data, <span class="math inline">\(C_{chisq}\)</span> can be corrected by adding…</p>
+<p>C chisq-adj</p>
+</div>
+</div>
+<div id="example-data-sets" class="section level2">
+<h2>Example data sets</h2>
+<p>Two example data sets are provided to demonstrate how these functions could be used.</p>
+<div id="example-stress-resistance-in-yeast" class="section level3">
+<h3>Example: Stress resistance in yeast</h3>
+<p>The</p>
+</div>
+<div id="example-cold-tolerance-in-conifers" class="section level3">
+<h3>Example: Cold tolerance in conifers</h3>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

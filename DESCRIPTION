@@ -5,11 +5,11 @@ Version: 0.1.0
 Authors@R: person("Sam", "Yeaman", email = "samuel.yeaman@ucalgary.ca",
   role = c("aut", "cre")), 
   person("Aleeza", "Gerstein", email = "Aleeza.Gerstein@umanitoba.ca",
-  role = c("aut", "cre")),
+  role = c("aut")),
   person("Alana", "Schick", email = "alana.schick@gmail.com",
-  role = c("aut", "cre")),
+  role = c("aut")),
   person("Margot", "Henry", email = "henrym3@myumanitoba.ca",
-  role = c("aut", "cre")),
+  role = c("aut")),
 Description: This package provides various functions for calculating the constraint metrics described in the manuscript "Quantifying how constraints limit the diversity of viable routes to adaptation". Please read this paper for a full description of the usage of these functions.
 License: CC0
 Encoding: UTF-8

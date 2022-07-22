@@ -24,7 +24,7 @@ single_p_hyper <- function (input1, input2, na.rm = F){
   
   ax <- sum (input1, na.rm = na.rm)
   ay <- sum (input2, na.rm = na.rm)
-  g0 <- length (input1)
+  g0 <- as.numeric (length (input1))
 
   sd_hyp <- sqrt((ax*ay)*(g0-ax)*(g0-ay)/(g0^2*(g0-1)))
   exp_hyp <- ax * ay / g0

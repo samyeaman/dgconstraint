@@ -39,7 +39,7 @@ single_p_chisq <- function (input1, input2 ,num_permute = 10000,na.rm = F){
     in2 <- sample(input2, length(input2), replace = F)
     
     both2 <- cbind(in1, in2)
-    obs2 <- rowSums(both,na.rm = na.rm)
+    obs2 <- rowSums(both2,na.rm = na.rm)
     exp2 <- array (mean(obs2),length(obs2))
     chisq2 <- (obs2 - exp2)^2/exp2
 
